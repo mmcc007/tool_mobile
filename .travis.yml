@@ -1,0 +1,24 @@
+language: generic
+
+env:
+  global:
+    - FLUTTER_CHANNEL=stable
+    - FLUTTER_VERSION=1.7.8+hotfix.4-${FLUTTER_CHANNEL}
+    - FLUTTER_ROOT=./flutter # for tests
+    - OS=linux
+
+# install flutter on linux
+before_install:
+  - sudo apt-get install -y --no-install-recommends lib32stdc++6 libstdc++6 > /dev/null
+  # install pre-compiled flutter
+  - wget --quiet --output-document=flutter.tar.xz https://storage.googleapis.com/flutter_infra/releases/${FLUTTER_CHANNEL}/${OS}/flutter_${OS}_v${FLUTTER_VERSION}.tar.xz && tar xf flutter.tar.xz > /dev/null && rm flutter.tar.xz
+  - export PATH="$PATH":"$HOME/.pub-cache/bin"
+  - export PATH=$PWD/flutter/bin:$PWD/flutter/bin/cache/dart-sdk/bin:$PATH
+  - flutter doctor -v
+install:
+  # install coverage tool
+  - pub global activate coverage
+script:
+  - pub get
+  - script/code_coverage.sh
+after_success: bash <(curl -s https://codecov.io/bash) -f coverage/lcov.info
