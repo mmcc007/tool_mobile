@@ -1,3 +1,5 @@
-## 1.0.0
+## 1.9.5
 
-- Initial version, created by Stagehand
+- Initial version.  
+Partial contents of https://github.com/flutter/flutter/tree/v1.9.5/packages/flutter_tools/lib/src/android
+- Added dependency on tool_base package.
