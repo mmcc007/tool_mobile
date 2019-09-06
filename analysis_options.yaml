@@ -10,11 +10,9 @@ analyzer:
   exclude:
     - "test/src/**"
     - "example/**"
-    - "test/base/all_tests.dart"
 
 linter:
   rules:
     unawaited_futures: true
     avoid_as: false # Disabled so we can gradually migrate to no implicit dynamic.
-    avoid_bool_literals_in_conditional_expressions: false
     always_put_control_body_on_new_line: false
