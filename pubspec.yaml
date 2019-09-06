@@ -1,6 +1,6 @@
 name: tool_mobile
 description: Flutter Tools' base plus mobile. Use to create command line tools.
-version: 1.9.5
+version: 1.9.5+1
 homepage: https://github.com/mmcc007/tool_mobile
 author: Maurice McCabe <mmcc007@gmail.com>
 
@@ -8,7 +8,7 @@ environment:
   sdk: '>=2.1.0 <3.0.0'
 
 dependencies:
-  tool_base: 1.9.5
+  tool_base: ^1.9.5
 
 dev_dependencies:
   pedantic: ^1.0.0
