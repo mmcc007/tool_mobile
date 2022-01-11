@@ -3,14 +3,10 @@
 // found in the LICENSE file.
 
 import 'package:file/memory.dart';
-import 'package:tool_base/tool_base.dart';
-import 'package:tool_mobile/src/android/android_sdk.dart';
-import 'package:tool_base/src/base/file_system.dart';
-import 'package:tool_base/src/base/io.dart' show ProcessResult;
-import 'package:tool_base/src/base/platform.dart';
-import 'package:tool_base/src/base/config.dart';
 import 'package:mockito/mockito.dart';
 import 'package:process/process.dart';
+import 'package:tool_base/tool_base.dart';
+import 'package:tool_mobile/src/android/android_sdk.dart';
 
 import '../src/common.dart';
 import '../src/context.dart';
@@ -19,8 +15,8 @@ import '../src/mocks.dart';
 class MockProcessManager extends Mock implements ProcessManager {}
 
 void main() {
-  MemoryFileSystem fs;
-  MockProcessManager processManager;
+  MemoryFileSystem fs = MemoryFileSystem();
+  MockProcessManager processManager = MockProcessManager();
 
   setUp(() {
     fs = MemoryFileSystem();
@@ -28,7 +24,7 @@ void main() {
   });
 
   group('android_sdk AndroidSdk', () {
-    Directory sdkDir;
+    Directory? sdkDir;
 
     tearDown(() {
       if (sdkDir != null) {
@@ -39,9 +35,9 @@ void main() {
 
     testUsingContext('parse sdk', () {
       sdkDir = MockAndroidSdk.createSdkDirectory();
-      Config.instance.setValue('android-sdk', sdkDir.path);
+      Config.instance?.setValue('android-sdk', sdkDir?.path);
 
-      final AndroidSdk sdk = AndroidSdk.locateAndroidSdk();
+      final AndroidSdk sdk = AndroidSdk.locateAndroidSdk()!;
       expect(sdk.latestVersion, isNotNull);
       expect(sdk.latestVersion.sdkLevel, 23);
     }, overrides: <Type, Generator>{
@@ -50,9 +46,9 @@ void main() {
 
     testUsingContext('parse sdk N', () {
       sdkDir = MockAndroidSdk.createSdkDirectory(withAndroidN: true);
-      Config.instance.setValue('android-sdk', sdkDir.path);
+      Config.instance?.setValue('android-sdk', sdkDir?.path);
 
-      final AndroidSdk sdk = AndroidSdk.locateAndroidSdk();
+      final AndroidSdk sdk = AndroidSdk.locateAndroidSdk()!;
       expect(sdk.latestVersion, isNotNull);
       expect(sdk.latestVersion.sdkLevel, 24);
     }, overrides: <Type, Generator>{
@@ -61,9 +57,9 @@ void main() {
 
     testUsingContext('returns sdkmanager path', () {
       sdkDir = MockAndroidSdk.createSdkDirectory();
-      Config.instance.setValue('android-sdk', sdkDir.path);
+      Config.instance?.setValue('android-sdk', sdkDir?.path);
 
-      final AndroidSdk sdk = AndroidSdk.locateAndroidSdk();
+      final AndroidSdk sdk = AndroidSdk.locateAndroidSdk()!;
       expect(sdk.sdkManagerPath,
           fs.path.join(sdk.directory, 'tools', 'bin', 'sdkmanager'));
     }, overrides: <Type, Generator>{
@@ -72,9 +68,9 @@ void main() {
 
     testUsingContext('returns sdkmanager version', () {
       sdkDir = MockAndroidSdk.createSdkDirectory();
-      Config.instance.setValue('android-sdk', sdkDir.path);
+      Config.instance?.setValue('android-sdk', sdkDir?.path);
 
-      final AndroidSdk sdk = AndroidSdk.locateAndroidSdk();
+      final AndroidSdk sdk = AndroidSdk.locateAndroidSdk()!;
       when(processManager.canRun(sdk.sdkManagerPath)).thenReturn(true);
       when(processManager.runSync(<String>[sdk.sdkManagerPath, '--version'],
               environment: argThat(isNotNull, named: 'environment')))
@@ -87,9 +83,9 @@ void main() {
 
     testUsingContext('returns validate sdk is well formed', () {
       sdkDir = MockBrokenAndroidSdk.createSdkDirectory();
-      Config.instance.setValue('android-sdk', sdkDir.path);
+      Config.instance!.setValue('android-sdk', sdkDir!.path);
 
-      final AndroidSdk sdk = AndroidSdk.locateAndroidSdk();
+      final AndroidSdk sdk = AndroidSdk.locateAndroidSdk()!;
       when(processManager.canRun(sdk.adbPath)).thenReturn(true);
 
       final List<String> validationIssues = sdk.validateSdkWellFormed();
@@ -106,9 +102,9 @@ void main() {
 
     testUsingContext('does not throw on sdkmanager version check failure', () {
       sdkDir = MockAndroidSdk.createSdkDirectory();
-      Config.instance.setValue('android-sdk', sdkDir.path);
+      Config.instance!.setValue('android-sdk', sdkDir!.path);
 
-      final AndroidSdk sdk = AndroidSdk.locateAndroidSdk();
+      final AndroidSdk sdk = AndroidSdk.locateAndroidSdk()!;
       when(processManager.canRun(sdk.sdkManagerPath)).thenReturn(true);
       when(processManager.runSync(<String>[sdk.sdkManagerPath, '--version'],
               environment: argThat(isNotNull, named: 'environment')))
@@ -122,9 +118,9 @@ void main() {
     testUsingContext(
         'throws on sdkmanager version check if sdkmanager not found', () {
       sdkDir = MockAndroidSdk.createSdkDirectory(withSdkManager: false);
-      Config.instance.setValue('android-sdk', sdkDir.path);
+      Config.instance!.setValue('android-sdk', sdkDir!.path);
 
-      final AndroidSdk sdk = AndroidSdk.locateAndroidSdk();
+      final AndroidSdk sdk = AndroidSdk.locateAndroidSdk()!;
       when(processManager.canRun(sdk.sdkManagerPath)).thenReturn(false);
       expect(() => sdk.sdkManagerVersion, throwsToolExit());
     }, overrides: <Type, Generator>{
@@ -140,9 +136,9 @@ void main() {
         testUsingContext('detection on $os', () {
           sdkDir = MockAndroidSdk.createSdkDirectory(
               withAndroidN: true, withNdkDir: osDir, withNdkSysroot: true);
-          Config.instance.setValue('android-sdk', sdkDir.path);
+          Config.instance!.setValue('android-sdk', sdkDir!.path);
 
-          final String realSdkDir = sdkDir.path;
+          final String realSdkDir = sdkDir!.path;
           final String realNdkDir = fs.path.join(realSdkDir, 'ndk-bundle');
           final String realNdkCompiler = fs.path.join(
               realNdkDir,
@@ -155,12 +151,12 @@ void main() {
           final String realNdkSysroot =
               fs.path.join(realNdkDir, 'platforms', 'android-9', 'arch-arm');
 
-          final AndroidSdk sdk = AndroidSdk.locateAndroidSdk();
+          final AndroidSdk sdk = AndroidSdk.locateAndroidSdk()!;
           expect(sdk.directory, realSdkDir);
           expect(sdk.ndk, isNotNull);
-          expect(sdk.ndk.directory, realNdkDir);
-          expect(sdk.ndk.compiler, realNdkCompiler);
-          expect(sdk.ndk.compilerArgs, <String>['--sysroot', realNdkSysroot]);
+          expect(sdk.ndk!.directory, realNdkDir);
+          expect(sdk.ndk!.compiler, realNdkCompiler);
+          expect(sdk.ndk!.compilerArgs, <String>['--sysroot', realNdkSysroot]);
         }, overrides: <Type, Generator>{
           FileSystem: () => fs,
           Platform: () => FakePlatform(operatingSystem: os),
@@ -172,9 +168,9 @@ void main() {
               withNdkDir: osDir,
               withNdkSysroot: true,
               ndkVersion: 18);
-          Config.instance.setValue('android-sdk', sdkDir.path);
+          Config.instance!.setValue('android-sdk', sdkDir!.path);
 
-          final String realSdkDir = sdkDir.path;
+          final String realSdkDir = sdkDir!.path;
           final String realNdkDir = fs.path.join(realSdkDir, 'ndk-bundle');
           final String realNdkToolchainBin = fs.path.join(
               realNdkDir,
@@ -190,12 +186,12 @@ void main() {
           final String realNdkSysroot =
               fs.path.join(realNdkDir, 'platforms', 'android-9', 'arch-arm');
 
-          final AndroidSdk sdk = AndroidSdk.locateAndroidSdk();
+          final AndroidSdk sdk = AndroidSdk.locateAndroidSdk()!;
           expect(sdk.directory, realSdkDir);
           expect(sdk.ndk, isNotNull);
-          expect(sdk.ndk.directory, realNdkDir);
-          expect(sdk.ndk.compiler, realNdkCompiler);
-          expect(sdk.ndk.compilerArgs,
+          expect(sdk.ndk!.directory, realNdkDir);
+          expect(sdk.ndk!.compiler, realNdkCompiler);
+          expect(sdk.ndk!.compilerArgs,
               <String>['--sysroot', realNdkSysroot, '-fuse-ld=$realNdkLinker']);
         }, overrides: <Type, Generator>{
           FileSystem: () => fs,
@@ -206,10 +202,10 @@ void main() {
       for (String os in <String>['linux', 'macos']) {
         testUsingContext('detection on $os (no ndk available)', () {
           sdkDir = MockAndroidSdk.createSdkDirectory(withAndroidN: true);
-          Config.instance.setValue('android-sdk', sdkDir.path);
+          Config.instance!.setValue('android-sdk', sdkDir!.path);
 
-          final String realSdkDir = sdkDir.path;
-          final AndroidSdk sdk = AndroidSdk.locateAndroidSdk();
+          final String realSdkDir = sdkDir!.path;
+          final AndroidSdk sdk = AndroidSdk.locateAndroidSdk()!;
           expect(sdk.directory, realSdkDir);
           expect(sdk.ndk, isNull);
           final String explanation =
@@ -228,7 +224,7 @@ void main() {
 class MockBrokenAndroidSdk extends Mock implements AndroidSdk {
   static Directory createSdkDirectory({
     bool withAndroidN = false,
-    String withNdkDir,
+    String? withNdkDir,
     bool withNdkSysroot = false,
     bool withSdkManager = true,
   }) {
@@ -249,7 +245,7 @@ class MockBrokenAndroidSdk extends Mock implements AndroidSdk {
   }
 
   static void _createSdkFile(Directory dir, String filePath,
-      {String contents}) {
+      {String? contents}) {
     final File file = dir.childFile(filePath);
     file.createSync(recursive: true);
     if (contents != null) {
