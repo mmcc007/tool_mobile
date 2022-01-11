@@ -5,10 +5,6 @@
 import 'package:file/memory.dart';
 import 'package:mockito/mockito.dart';
 import 'package:process/process.dart';
-import 'package:tool_base/src/base/config.dart';
-import 'package:tool_base/src/base/file_system.dart';
-import 'package:tool_base/src/base/io.dart' show ProcessResult;
-import 'package:tool_base/src/base/platform.dart';
 import 'package:tool_base/tool_base.dart';
 import 'package:tool_mobile/src/android/android_sdk.dart';
 
